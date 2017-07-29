@@ -1,0 +1,187 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@{
+    WebGrid grid = null;
+    var dataFilter = Request["goal"];
+    if (dataFilter != null)
+    {
+        var db = Database.Open("DataDB");
+
+        var selectQueryString = "SELECT G.IndicatorName, D.* " +
+                                "FROM GoalsData D " +
+                                "LEFT JOIN(SELECT DISTINCT GoalNumber, GoalKey, IndicatorName FROM GoalsDetails WHERE GoalNumber = '" + dataFilter + "') G  " +
+                                "ON D.GoalKey = G.GoalKey";
+
+        var entryStats = db.Query(selectQueryString);
+        var numOFentryEvents = entryStats.Count();
+
+        grid = new WebGrid(db.Query(selectQueryString), ajaxUpdateContainerId: "grid", rowsPerPage: 15);
+    }
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    Page.Title = "Golf Events Admin";
+}
+
+
+<!-- Header -->
+<header>
+    <div class="container">
+        <div class="intro-text">
+            <div class="intro-heading">API Explorer</div>
+        </div>
+    </div>
+</header>
+
+<section id="api">
+    <div class="container">
+
+
+            <a href="~/api-explorer?goal=1">
+                <img src="~/wwwroot/images/JPEG/E_SDG_goals_icons-individual-rgb-01.jpg" />
+            </a>
+
+
+            <a href="~/api-explorer?goal=2">
+                <img src="~/wwwroot/images/JPEG/E_SDG goals_icons-individual-rgb-02.jpg">
+            </a>
+
+
+            <a href="~/api-explorer?goal=3">
+                <img src="~/wwwroot/images/JPEG/E_SDG goals_icons-individual-rgb-03.jpg">
+            </a>
+
+
+            <a href="~/api-explorer?goal=4">
+                <img src="~/wwwroot/images/JPEG/E_SDG goals_icons-individual-rgb-04.jpg">
+            </a>
+
+
+            <a href="~/api-explorer?goal=5">
+                <img src="~/wwwroot/images/JPEG/E_SDG goals_icons-individual-rgb-05.jpg">
+            </a>
+
+
+            <a href="~/api-explorer?goal=6">
+                <img src="~/wwwroot/images/JPEG/E_SDG goals_icons-individual-rgb-06.jpg">
+            </a>
+
+
+            <a href="~/api-explorer?goal=7">
+                <img src="~/wwwroot/images/JPEG/E_SDG goals_icons-individual-rgb-07.jpg">
+            </a>
+
+
+            <a href="~/api-explorer?goal=8">
+                <img src="~/wwwroot/images/JPEG/E_SDG goals_icons-individual-rgb-08.jpg">
+            </a>
+
+
+            <a href="~/api-explorer?goal=9">
+                <img src="~/wwwroot/images/JPEG/E_SDG goals_icons-individual-rgb-09.jpg">
+            </a>
+
+
+            <a href="~/api-explorer?goal=10">
+                <img src="~/wwwroot/images/JPEG/E_SDG goals_icons-individual-rgb-10.jpg">
+            </a>
+
+
+            <a href="~/api-explorer?goal=11">
+                <img src="~/wwwroot/images/JPEG/E_SDG goals_icons-individual-rgb-11.jpg">
+            </a>
+
+
+            <a href="~/api-explorer?goal=12">
+                <img src="~/wwwroot/images/JPEG/E_SDG goals_icons-individual-rgb-12.jpg">
+            </a>
+
+
+            <a href="~/api-explorer?goal=13">
+                <img src="~/wwwroot/images/JPEG/E_SDG goals_icons-individual-rgb-13.jpg">
+            </a>
+
+
+            <a href="~/api-explorer?goal=14">
+                <img src="~/wwwroot/images/JPEG/E_SDG goals_icons-individual-rgb-14.jpg">
+            </a>
+
+
+            <a href="~/api-explorer?goal=15">
+                <img src="~/wwwroot/images/JPEG/E_SDG goals_icons-individual-rgb-15.jpg">
+            </a>
+
+
+            <a href="~/api-explorer?goal=16">
+                <img src="~/wwwroot/images/JPEG/E_SDG goals_icons-individual-rgb-16.jpg">
+            </a>
+
+
+            <a href="~/api-explorer?goal=17">
+                <img src="~/wwwroot/images/JPEG/E_SDG goals_icons-individual-rgb-17.jpg">
+            </a>
+
+
+    </div>
+</section>
+@if(dataFilter != null)
+{
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="boxIT">
+                    <div class="pagehead">
+                        <div class="col-md-3 pageTitle">
+                            
+                        </div>
+                        <div class="col-md-9 pageActions">
+                        </div>
+                    </div>
+                    <div class="boxBody">
+                        @grid.Table(
+                            tableStyle: "table table-striped",
+                            headerStyle: "greyHeadTable",
+                            footerStyle: "webgrid-footer",
+                            alternatingRowStyle: "alternate",
+                            columns: grid.Columns(
+                        //grid.Column(columnName: "EventID", header: "Event ID"),
+                        //grid.Column(columnName: "EventDateStart", header: "Event Date", format: (item) => string.Format("{0:dd MMM yyyy}", item.EventDateStart)),
+                        //grid.Column(columnName: "HostClubID", header: "Host Club"),
+                        //grid.Column(columnName: "EventTitle", header: "Event Title"),
+                        //grid.Column(columnName: "EventTags", header: "Event Tags"),
+                        //grid.Column(columnName: "AllowEntrySystem", header: "Entry System On?"),
+                        //grid.Column(columnName: "AllowEntrySystem", header: "Payment Option", format: (item) =>
+                        //{
+                        //    if (item.AllowEntrySystem == "ON")
+                        //    {
+                        //        return Html.Raw("<a href='/Manager/EntrySystem/CustomEntrySetup/Add?id=" + @item.EventID + "' id='Edit_" + @item.EventID + "' class='btn btn-primary'>Payment Option</a>");
+                        //    }
+                        //    else
+                        //    {
+                        //        return Html.Raw("");
+                        //    }
+                        //}
+                        ))
+                        <div class="pull-right">
+                            @grid.PagerList(mode: WebGridPagerModes.NextPrevious | WebGridPagerModes.Numeric | WebGridPagerModes.FirstLast, numericLinksCount: 5, paginationStyle: "pagination", previousText: "«", nextText: "»", firstText: "First", lastText: "Last")
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+@section FooterExtra {
+        <script>
+            $(document).ready(function () {
+                //Clickable Rows
+                $('tbody tr').on('mouseenter mouseleave', function () {
+                    $(this).toggleClass('clickable');
+                }).on('click', function () {
+                    location.href = 'Events/AddEdit?id=' + $(this).find('td:first').text();
+                });
+            });
+        </script>
+}
