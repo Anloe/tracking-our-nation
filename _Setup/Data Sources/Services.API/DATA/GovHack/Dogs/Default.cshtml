@@ -1,0 +1,69 @@
+﻿@using Newtonsoft.Json;
+@using System.Configuration;
+@{
+    Layout = null;
+
+    var response = "";
+    int statusCode = 200;
+
+    //Check For GET
+    var apiMethod = Request.HttpMethod;
+
+    //Check Auth Header
+    string token = "";
+    try
+    {
+        //token = Request.Headers.GetValues("Authorization").FirstOrDefault();
+        token = Request.Headers.GetValues("UserAuthToken").First();
+    }
+    catch (Exception ex)
+    {
+        token = ex.ToString();
+        statusCode = 401;
+    }
+
+    var authToken = ConfigurationManager.AppSettings["DogsAuthToken"];
+
+    //Temp for testing
+    //token = authToken;
+
+    if (token == authToken)
+    {
+        string PropNo = Request["p"];
+        string SearchProperties = Request["s"];
+
+        //Temp Until Search is ready
+        SearchProperties = null;
+
+        if (PropNo != null || SearchProperties != null)
+        {
+            var db = Database.Open("aCORE_Warehouse");
+
+            //Property Details
+            var sql = "SELECT [ANIMAL_TYPE],[animalid],[tag],[dogdescription],[PROPERTY_NO],[name],[given_names],[HOME_PHONE],[MOBILE_PHONE],[formatted_address],[ownername],[seqnum] " +
+                      "FROM [VW_ANIMALS_PROPERTY] P ";
+                               //"WHERE P.Status <> 'P' AND PROPERTY_NO = '" + PropNo + "'";
+
+            var PropDetails = db.QuerySingle(sql);
+
+            string json = Json.Encode(PropDetails);
+
+            response = json;
+
+            statusCode = 200;
+        }
+        else
+        {
+            statusCode = 400;
+        }
+    }
+
+    //Security
+    Response.Headers.Remove("Server");
+    Response.Headers.Remove("X-AspNet-Version");
+    Response.Headers.Remove("x-aspnetwebpages-version");
+
+    Response.ContentType = "application/json";
+    Response.StatusCode = statusCode;
+    Response.Write(response);
+}

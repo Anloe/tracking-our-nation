@@ -1,0 +1,34 @@
+﻿@{
+    Layout = "~/Master/_Layout.cshtml";
+    Page.Title = "Delete Club";
+
+    int id = Request["id"].AsInt();
+
+    var db = Database.Open("AdminDB");
+
+    if(IsPost){
+          var executeQueryString="DELETE FROM UserProfile WHERE UserId=@0";
+          db.Execute(executeQueryString, id);
+          Response.Redirect("~/Master/Administrators");
+    }
+
+    var selectQueryString = "SELECT * from UserProfile WHERE UserId = @0";
+    var User = db.QuerySingle(selectQueryString, id);
+}
+
+        <section class="container">
+                <div class="row">
+                    <div class="span4 offset1">
+                      <div class="well">
+                        <h1>Delete Club Administrator</h1>
+                        <form action="" method="post">
+                            <h4>Are you sure you want to delete<br>User "@User.Email"<br> for Club "@User.ClubId"" </h4>
+                            <input class="btn btn-danger" type="submit" value="Delete Club" />
+                            <a class="btn" href="~/Master/Administrators">Cancel</a>
+                        </form>  
+                      </div>
+                    </div>
+                </div>
+
+        </section>
+

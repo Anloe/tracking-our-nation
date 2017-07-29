@@ -1,0 +1,62 @@
+﻿@using Newtonsoft.Json;
+@using System.Configuration;
+@{
+    Layout = null;
+
+    var response = "";
+    int statusCode = 200;
+
+    //Check For GET
+    var apiMethod = Request.HttpMethod;
+
+    //Check Auth Header
+    string token = "";
+    try
+    {
+        //token = Request.Headers.GetValues("Authorization").FirstOrDefault();
+        token = Request.Headers.GetValues("UserAuthToken").First();
+    }
+    catch (Exception ex)
+    {
+        token = ex.ToString();
+        statusCode = 401;
+    }
+
+    var authToken = ConfigurationManager.AppSettings["DogsAuthToken"];
+
+    if (token == authToken)
+    {
+        //Assign NewToken based on encrytion of 
+        string NewToken = "Test";
+
+        // 1) Create Token
+        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        var length = 64;
+        Random random = new Random();
+        NewToken = new string(Enumerable.Repeat(chars, length).Select(s => s[random.Next(s.Length)]).ToArray());
+
+        // 2) Log Token & Set expiry DateTime
+
+
+        Dictionary<string, object> resultData = new Dictionary<string, object>();
+        resultData.Add("AuthKey", NewToken);
+
+        string json = JsonConvert.SerializeObject(resultData);
+        response = json;
+
+        statusCode = 200;
+    }
+    else
+    {
+        statusCode = 401;
+    }
+
+    //Security
+    Response.Headers.Remove("Server");
+    Response.Headers.Remove("X-AspNet-Version");
+    Response.Headers.Remove("x-aspnetwebpages-version");
+
+    Response.ContentType = "application/json";
+    Response.StatusCode = statusCode;
+    Response.Write(response);
+}

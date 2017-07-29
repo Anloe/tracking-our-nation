@@ -1,0 +1,62 @@
+﻿@{
+    Page.Title = "Custom SQL";
+
+        if (IsPost) {
+            AntiForgery.Validate();
+            if (Validation.IsValid()) {
+                var db = Database.Open("BrandNewDB");
+                var daQuery = Request.Unvalidated("QueryString");
+                if (daQuery.Length > 5) {
+                    try {
+                        db.Execute(daQuery);
+                    } 
+                    catch (Exception e) {
+                        ModelState.AddFormError(e.Message);
+                    }
+                }
+            }
+        }
+}
+
+                <div class="row">
+                    <div class="span4 offset4">
+                      <div class="well">
+                        <form method="post">
+                            @AntiForgery.GetHtml()
+                            @Html.ValidationSummary("Fark it!!!", excludeFieldErrors: true, htmlAttributes: null)
+                            <fieldset>
+                                <legend>Add SQL Here</legend>
+                                <a id="SelectQuery" class="btn btn-small"><i class="icon-edit"></i> <strong>Select</strong></a>
+                                <a id="UpdateQuery" class="btn btn-small"><i class="icon-edit"></i> <strong>Update</strong></a>
+                                <a id="DeleteQuery" class="btn btn-small"><i class="icon-trash"></i> <strong>Delete</strong></a>
+                                <a id="ClearQuery" class="btn btn-small"><i class="icon-trash"></i> <strong>Clear</strong></a>
+                                <textarea id="QueryString" name="QueryString" rows="10" cols="60"></textarea>
+                                <input class="btn-primary btn" type="submit" value="ExecuteSQL" />
+                                <a class="btn btn-danger" href="~/Dashboard">Cancel</a>
+                            </fieldset>
+                        </form>
+                      </div>
+                    </div>
+                </div>
+
+@section PageScripts {
+    <script>
+        $(document).ready(function(){
+              $("#SelectQuery").click(function(){
+                $("#QueryString").val("SELECT * FROM table_name WHERE ");
+              });
+
+              $("#UpdateQuery").click(function(){
+                $("#QueryString").val("UPDATE table_name SET column1=value, column2=value2 WHERE some_column=some_value");
+              });
+
+              $("#DeleteQuery").click(function(){
+                $("#QueryString").val("DELETE FROM table_name WHERE some_column=some_value");
+              });
+
+              $("#ClearQuery").click(function(){
+                $("#QueryString").val("");
+              });
+        });
+    </script>
+}

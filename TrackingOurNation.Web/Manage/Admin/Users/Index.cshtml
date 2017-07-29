@@ -1,0 +1,73 @@
+﻿@{
+    if(IsPost){
+        var eventFilter = Request["AdminFilter"];
+        if(eventFilter != null){
+            Response.Redirect("~/Manage/Admin/Users?AdminSearch=" + eventFilter);
+        }
+    } 
+
+    var db = Database.Open("AdminDB");
+    var selectQueryString = "Select * From UserProfile";
+
+    var findAdmin = Request["AdminSearch"];
+    if(findAdmin != null){
+        selectQueryString = "Select * From UserProfile WHERE Email LIKE '%" + findAdmin + "%'";
+    }
+
+    var grid = new WebGrid(db.Query(selectQueryString), ajaxUpdateContainerId: "grid",rowsPerPage: 15);
+
+    Page.Title = "User Logins";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="boxIT">
+            <div class="pagehead">
+                <div class="col-md-3 pageTitle">
+                    Users
+                </div>
+                <div class="col-md-9 pageActions">
+                    <a class="btn btn-primary pull-right" href="~/Manage/Admin/Users/Register"><i class="icon-plus"></i> Register New</a>
+                    <a class="btn btn-info pull-right" href="~/Manage/Admin/Users">Show All</a>
+                    @*<form id="searchform" class="pull-right" method="post">
+                        <div id="searchBox">
+                            <input type="text" class="searchinput" name="AdminFilter" id="AdminFilter" placeholder="Filter Admins by ClubID">
+                            <input type="submit" id="searchsubmit" value="" class="btnSearch">
+                        </div>
+                    </form>*@
+                </div>
+            </div>
+            <div class="boxBody">
+                @grid.Table(
+                tableStyle: "table table-striped",
+                headerStyle: "greyHeadTable",
+                footerStyle: "webgrid-footer",
+                alternatingRowStyle: "alternate",
+                columns: grid.Columns(
+                        @*grid.Column( header:"", format:@<text><a href="News/Edit?id=@item.NewsID">Edit</a></text>),
+                        grid.Column( header:"", format:@<text><a href="News/Delete?id=@item.NewsID">Delete</a></text>),*@
+                        grid.Column(columnName: "UserId"),
+                        grid.Column(columnName: "Email"),
+                        grid.Column(header: "", format: @<text><a href="Delete?id=@item.UserId">Delete</a></text>)
+                      )
+                  )
+                <div class="pull-right">
+                    @grid.PagerList(mode: WebGridPagerModes.NextPrevious | WebGridPagerModes.Numeric | WebGridPagerModes.FirstLast, numericLinksCount: 5, paginationStyle: "pagination", previousText: "«", nextText: "»", firstText: "First", lastText: "Last")
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section FooterExtra {
+    @*<script>
+        $(document).ready(function () {
+            //Clickable Rows
+            $('tbody tr').on('mouseenter mouseleave', function(){
+                $(this).toggleClass('clickable');
+            }).on('click', function(){
+                location.href = 'Events/AddEdit?id=' + $(this).find('td:first').text();
+            });
+        });
+    </script>*@
+}

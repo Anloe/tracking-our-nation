@@ -1,0 +1,37 @@
+﻿@{
+    Page.Title = "Delete Event";
+
+    int id = Request["id"].AsInt();
+
+    var db = Database.Open("BrandNewDB");
+
+    if(IsPost){
+          var executeQueryString="DELETE FROM EVENTS WHERE EventID=@0";
+          db.Execute(executeQueryString, id);
+
+          Response.Redirect("~/Master/Events");
+    }
+
+    var selectQueryString = "SELECT EventID, EventTitle from EVENTS WHERE EventID = @0";
+    var Event = db.QuerySingle(selectQueryString, id);
+}
+
+<div class="col-md-4 col-md-offset-4">
+    <div class="boxIT">
+        <div class="boxhead">
+            Delete Event
+        </div>
+        <div class="boxBody">
+            <form action="" method="post">
+                <br>
+                <h4>Are you sure you want to Delete Event <br>"@Event.EventID - @Event.EventTitle"</h4>
+                <br><br>
+                <div class="form-actions">
+                    <input class="btn btn-danger" type="submit" value="Delete Event" />
+                    <a class="btn btn-info" href="~/Master/Events/AddEdit?id=@Event.EventID">Cancel</a>                
+                </div>
+            </form>             
+        </div>
+    </div>
+</div>
+

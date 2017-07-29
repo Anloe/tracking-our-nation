@@ -1,0 +1,89 @@
+﻿@{
+    if(IsPost){
+        var eventFilter = Request["EventFilter"];
+        if(eventFilter != null){
+            Response.Redirect("~/Master/Events?EventSearch=" + eventFilter);
+        }
+    } 
+
+    var db = Database.Open("BrandNewDB");
+    var selectQueryString = "SELECT T.* FROM " +
+                                "(SELECT EventID, HostClubID, EventDateStart, EventTags, EventTitle, EventDescription, OtherClubIDs, AllowEntrySystem, '1' AS xID " +
+                                "FROM EVENTS " +
+                                //"WHERE HostClubID = '19781978' AND EventDateStart >= getdate() " +
+                                "WHERE EventDateStart >= getdate() " +
+                                "UNION ALL " +
+                                "SELECT EventID, HostClubID, EventDateStart, EventTags, EventTitle, EventDescription, OtherClubIDs, AllowEntrySystem, '2' AS xID " +
+                                "FROM EVENTS  " +
+                                //"WHERE HostClubID = '19781978' AND EventDateStart < getdate()) AS T " +
+                                "WHERE EventDateStart < getdate()) AS T " +
+                            "ORDER BY T.xID, T.EventDateStart";
+
+    var findEvent = Request["EventSearch"];
+    if(findEvent != null){
+        selectQueryString = "SELECT EventID, HostClubID, EventDateStart, EventTags, EventTitle, EventDescription, OtherClubIDs, AllowEntrySystem " + 
+                            "FROM EVENTS " + 
+                            "WHERE (EventTitle LIKE '%" + findEvent + "%' OR EventID LIKE '%" + findEvent + "%') ORDER BY EventDateStart";
+    }
+
+    var grid = new WebGrid(db.Query(selectQueryString), rowsPerPage: 15);
+
+    Page.Title = "Golf Events Admin";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="boxIT">
+            <div class="pagehead">
+                <div class="col-md-3 pageTitle">
+                    Events
+                </div>
+                <div class="col-md-9 pageActions">
+                    @if(WebSecurity.CurrentUserName == "dave@golfison.com"){
+                       <a class="btn btn-danger pull-right" href="Events/Upload"><i class="icon-plus"></i> Bulk Upload</a> 
+                    }
+                    <a class="btn btn-primary pull-right" href="Events/AddEdit"><i class="icon-plus"></i> Add New</a>
+                    <a class="btn btn-info pull-right" href="Events">Show All</a>
+                    <form id="searchform" class="pull-right" method="post">
+                        <div id="searchBox">
+                            <input type="text" class="searchinput" name="EventFilter" id="EventSearch" placeholder="Filter Events">
+                            <input type="submit" id="searchsubmit" value="" class="btnSearch">
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="boxBody">
+                @grid.Table(
+                    tableStyle: "table table-striped",
+                    headerStyle: "greyHeadTable",
+                    footerStyle: "webgrid-footer",
+                    alternatingRowStyle : "alternate",
+                    columns: grid.Columns(
+                        grid.Column( columnName : "EventID", header: "Event ID"),
+                        grid.Column( columnName : "EventDateStart", header: "Event Date", format: (item) => string.Format("{0:dd MMM yyyy}", item.EventDateStart)),
+                        grid.Column( columnName : "HostClubID", header: "Host Club"),
+                        grid.Column( columnName : "EventTitle", header: "Event Title"),
+                        grid.Column( columnName : "EventTags", header: "Event Tags"),
+                        grid.Column( columnName : "AllowEntrySystem", header: "Entry System On?")
+                    )
+                ) 
+                <div class="pull-right">
+                    @grid.PagerList(mode: WebGridPagerModes.NextPrevious | WebGridPagerModes.Numeric | WebGridPagerModes.FirstLast, numericLinksCount: 5, paginationStyle: "pagination", previousText: "«", nextText: "»", firstText: "First", lastText: "Last")
+                </div>              
+            </div>
+        </div>
+    </div>
+</div>
+
+@section FooterExtra {
+    <script>
+        $(document).ready(function () {
+            //Clickable Rows
+            $('tbody tr').on('mouseenter mouseleave', function(){
+                $(this).toggleClass('clickable');
+            }).on('click', function(){
+                location.href = 'Events/AddEdit?id=' + $(this).find('td:first').text();  
+            }); 
+        });
+    </script> 
+}

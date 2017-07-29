@@ -125,6 +125,7 @@ AutoTest.Net/
 # Installshield output folder
 [Ee]xpress/
 
+
 # DocProject is a documentation generator add-in
 DocProject/buildhelp/
 DocProject/Help/*.HxT
@@ -259,3 +260,8 @@ paket-files/
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
 *.pyc
+
+# GovHack Ignores
+__DO_NOT_PUBLISH/
+App_Data/PublishProfiles/
+App_Data/AdminDB.sdf

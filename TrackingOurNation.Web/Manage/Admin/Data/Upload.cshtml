@@ -1,0 +1,105 @@
+﻿@using System.Data;
+@using System.Data.Common;
+@using System.Data.OleDb;
+@{
+    DataSet dataset = new DataSet();
+    var fullPath = "";
+    var fName = "";
+
+    if(IsPost){
+
+        var UploadedCSVFile = Request.Files[0];
+        //var getFileName1 = Request.Files["EventDraws"];
+        var fileSavePath = "";
+
+            if(UploadedCSVFile != null){
+                if(UploadedCSVFile.ContentLength > 0){
+
+                    //Save to Server
+                    fileSavePath = Server.MapPath("~/Uploads/LoadFiles/" + Path.GetFileName(UploadedCSVFile.FileName));
+                    UploadedCSVFile.SaveAs(fileSavePath);
+                    fName = UploadedCSVFile.FileName; 
+                    //Load onto page
+                    fullPath = Path.GetFullPath(UploadedCSVFile.FileName);
+                    fullPath = Path.GetDirectoryName(fullPath);
+                    // Initialize connection variables
+                    string ConnectionString = "Provider=Microsoft.Jet.OLEDB.4.0; Data Source=" +
+                            Server.MapPath("~/Uploads/LoadFiles/") + @"; Extended Properties=""text;HDR=Yes;"";";
+                    string CommandText = "select * from [" + fName + "]";
+                    OleDbConnection myConnection = new OleDbConnection(ConnectionString);
+                    OleDbCommand myCommand = new OleDbCommand(CommandText, myConnection);
+                    //DataSet dataset = new DataSet();
+                    // Open connection
+                    myConnection.Open();
+                    // Fill DataSet
+                    OleDbDataAdapter oda = new OleDbDataAdapter(myCommand);
+                    oda.Fill(dataset);
+                    // Close connection
+                    myConnection.Close();
+
+                    //Upload to Database
+                    var db = Database.Open("BrandNewDB");
+                        foreach(DataRow row in dataset.Tables["Table"].Rows)
+                        {
+                            var HostClubID = row[0];
+                            var EventDateStart = row[1];
+                            DateTime AddEventDateStart=Convert.ToDateTime(EventDateStart);
+                            var EventDateEnd = row[2];
+                            DateTime? AddEventDateEnd;
+                            if(EventDateEnd.ToString() != ""){
+                                AddEventDateEnd=Convert.ToDateTime(EventDateEnd);
+                            }else{
+                                AddEventDateEnd = null;
+                            }
+                            var EventTimeStart = row[3];
+                            var EventTitle = row[4];
+                            var EventDescription = row[5];
+                            var EventTags = row[6];
+                            var EventSponsorIDs = row[7];
+                            var EventAdminIDs = row[8];
+                            var OtherClubIDs = row[9];
+
+                            var insertQueryString = "INSERT INTO EVENTS " +
+                                                    "(HostClubID, EventDateStart, EventDateEnd, EventTimeStart, EventTitle, EventDescription, EventTags, EventSponsorIDs, EventAdminIDs, OtherClubIDs) " +
+                                                    "VALUES (@0, @1, @2, @3, @4, @5, @6, @7, @8, @9)";
+                            db.Execute(insertQueryString, HostClubID, AddEventDateStart, AddEventDateEnd, EventTimeStart, EventTitle, EventDescription, EventTags, EventSponsorIDs, EventAdminIDs, OtherClubIDs);
+                        }
+
+                    db.Close();
+
+                    Response.Redirect("~/Master/Events");
+                }               
+            }else{
+                Response.Redirect("~/Master/Events/Upload"); 
+            }
+
+        fName = Path.GetFileName(UploadedCSVFile.FileName);
+
+
+    }
+    Page.Title = "Upload Events from CSV";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="boxIT">
+            <div class="pagehead">
+                <div class="col-md-3 pageTitle">
+                    Events Bulk Import
+                </div>
+                <div class="col-md-9 pageActions">
+                    <a class="btn btn-danger pull-right" href="/Dash/Events">Cancel</a>
+                </div>
+            </div>
+            <div class="boxBody">
+                <div class="col-md-12" style="margin-top: 30px;">
+                    @FileUpload.GetHtml(
+                        initialNumberOfFiles:1,
+                        allowMoreFilesToBeAdded:false,
+                        includeFormTag:true
+                    )                 
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

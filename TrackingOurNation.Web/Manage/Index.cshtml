@@ -1,0 +1,87 @@
+﻿@{
+
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <h1 class="PageTitle">
+            Dashboard
+        </h1>
+    </div>
+</div>
+       
+@section FooterExtra{
+<script src="~/Assets/Scripts/JQuery/jquery.easy-pie-chart.js"></script>
+<script>
+    $('.easy-pie-chart .number.XXRed').easyPieChart({
+                animate: 1000,
+                size: 100,
+                lineWidth: 10,
+                trackColor: "#FF7F7F",
+                barColor: "Red"
+    });
+    $('.easy-pie-chart .number.XXYellow').easyPieChart({
+                animate: 1000,
+                size: 100,
+                lineWidth: 10,
+                trackColor: "#FFF4CE",
+                barColor: "#FFC700"
+    });
+    $('.easy-pie-chart .number.XXBlue').easyPieChart({
+                animate: 1000,
+                size: 100,
+                lineWidth: 10,
+                trackColor: "#DFF5FD",
+                barColor: "#39B6E5"
+    });
+    $('.easy-pie-chart .number.XXGreen').easyPieChart({
+                animate: 1000,
+                size: 100,
+                lineWidth: 10,
+                trackColor: "#EAF3DD",
+                barColor: "#66A649"
+    });
+    $('.easy-pie-chart .number.XXClear').easyPieChart({
+                animate: 1000,
+                size: 100,
+                lineWidth: 10,
+                trackColor: "transparent",
+                barColor: "transparent"
+    });
+</script>
+<style>
+    .statsDial { text-align: center;}
+    .statsDial h3{ font-size: 50px;}
+    
+    .easyPieChart {
+        position: relative;
+        text-align: center;
+    }
+    .easy-pie-chart, .sparkline-chart {
+        text-align: center;
+        color: #808080;
+    }
+    .easy-pie-chart .number {
+        font-size: 32px;
+        font-weight: 300;
+        width: 85px;
+        margin: 0 auto;
+    }
+    .easyPieChart canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+    .easy-pie-chart .title {
+        display: block;
+        text-align: center;
+        color: #808080;
+        font-weight: 300;
+        font-size: 16px;
+        margin-top: 5px;
+        margin-bottom: 10px;
+        text-decoration: none;
+    }
+    
+</style>
+}

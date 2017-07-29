@@ -1,0 +1,29 @@
+﻿@{
+    Layout = null;
+    var returnUrl = Request.QueryString["ReturnUrl"];
+    if (returnUrl.IsEmpty())
+    {
+        returnUrl = Href("~/");
+    }
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Access Denied</title>
+    <link rel="icon" type="image/x-ico" href="~/favicon.ico" />
+    <link rel="stylesheet" href="~/Assets/Styles/bootstrap.css" />
+</head>
+<body>
+    <div class="container">
+        <div class="row" style="margin-top: 5px;">
+            <div class="col-md-12">
+                <h1>Access Denied</h1>
+            </div>
+            @*<div class="col-md-12">
+                <a class="btn btn-lg btn-success" href="@returnUrl">Go Back</a>
+            </div>*@
+        </div>
+    </div>
+</body>
+</html>

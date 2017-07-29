@@ -1,0 +1,80 @@
+﻿@{
+    if(IsPost){
+        var eventFilter = Request["SponsorsFilter"];
+        if(eventFilter != null){
+            Response.Redirect("~/Admin/Sponsors?find=" + eventFilter);
+        }
+    }  
+
+    var ClubId = Session["xCLUB"];
+    if(ClubId == null){
+        Response.Redirect("~/Admin/Login?ReturnUrl=" + Request.Url.LocalPath);
+    }
+
+    var selectQueryString = "Select * From SPONSORS WHERE ClubsLinked LIKE '%" + ClubId + "%'";
+
+    var FindIT = Request["find"];
+    if(FindIT != null){
+        selectQueryString = "Select * From SPONSORS WHERE ClubsLinked LIKE '%" + ClubId + "%' AND DisplayName LIKE '%" + FindIT + "%'";
+    }
+
+    var db = Database.Open("BrandNewDB");
+    var grid = new WebGrid(db.Query(selectQueryString), ajaxUpdateContainerId: "grid",rowsPerPage: 15);
+
+    Page.Title = "Club Sponsors";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="boxIT">
+            <div class="pagehead">
+                <div class="col-md-3 pageTitle">
+                    Club Sponsors
+                </div>
+                <div class="col-md-9 pageActions">
+                    <a class="btn btn-primary pull-right" href=""><i class="icon-plus"></i> Add New Sponsor</a> 
+                    <a class="btn btn-info pull-right" href="Sponsors">Show All</a>
+                    <form id="searchform" class="pull-right" method="post">
+                        <div id="searchBox">
+                            <input type="text" class="searchinput" name="SponsorsFilter" id="SponsorsSearch" placeholder="Filter Sponsors">
+                            <input type="submit" id="searchsubmit" value="" class="btnSearch">
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div id="NewsGrid" class="boxBody">
+                @grid.Table(
+                    tableStyle: "table table-striped",
+                    headerStyle: "greyHeadTable",
+                    alternatingRowStyle : "alternate",
+                    columns: grid.Columns(
+                        grid.Column( columnName : "SponsorID"),
+                        grid.Column( columnName : "DisplayName"),
+                        grid.Column( columnName : "WebLink")
+                    )
+                ) 
+                <div class="pull-right">
+                    @grid.PagerList(mode: WebGridPagerModes.NextPrevious | WebGridPagerModes.Numeric | WebGridPagerModes.FirstLast, numericLinksCount: 5, paginationStyle: "pagination", previousText: "«", nextText: "»", firstText: "First", lastText: "Last")
+                </div>              
+            </div>
+        </div>
+    </div>
+</div>
+
+@section FooterExtra {
+    <script>
+        $(document).ready(function () {
+            //Clickable Rows
+            $('tbody tr').on('mouseenter mouseleave', function(){
+                $(this).toggleClass('clickable');
+            }).on('click', function(){
+                location.href = 'Sponsors/AddEdit?id=' + $(this).find('td:first').text();  
+            }); 
+        });
+    </script> 
+    <style>
+        @*.hideIT {display: none;}*@
+        /* Hide News ID Column of Web Grid */
+        @*#NewsGrid table th:first-child, #NewsGrid table td:first-child { display: none;}*@
+    </style>
+}

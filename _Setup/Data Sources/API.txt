@@ -1,0 +1,18 @@
+services.qldc.govt.nz/api/data/gis/?p=3171
+
+H4O0v4oHE4MB19hoA2Tsrgzb9SkYWk646MDN69W54y62DE4L15h183V4xyEv
+
+
+
+http://gis.qldc.opendata.arcgis.com/
+
+
+
+/DATA/GovHack/Dogs/
+
+    <add key="WebMapsAuthToken" value="H4O0v4oHE4MB19hoA2Tsrgzb9SkYWk646MDN69W54y62DE4L15h183V4xyEv"/>
+    <add key="DogsAuthToken" value="32BB345E5579C994D4A2556E217886DCF2E78BF9DB275B7C7F18"/>
+    <add key="CemeteriesAuthToken" value="9C994D4A2556E217886DCF2E78BF9DB275B7C7F1832BB345E557"/>
+
+
+services.qldc.govt.nz/api/data/govhack/Dogs

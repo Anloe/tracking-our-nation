@@ -1,0 +1,70 @@
+﻿@using Newtonsoft.Json;
+@using System.Configuration;
+@{
+    Layout = null;
+
+    var response = "";
+    int statusCode = 200;
+
+    //Check For GET
+    var apiMethod = Request.HttpMethod;
+
+    //Check Auth Header
+    string token = "";
+    try
+    {
+        //token = Request.Headers.GetValues("Authorization").FirstOrDefault();
+        token = Request.Headers.GetValues("UserAuthToken").First();
+    }
+    catch (Exception ex)
+    {
+        token = ex.ToString();
+        statusCode = 401;
+    }
+
+    var authToken = ConfigurationManager.AppSettings["CemeteriesAuthToken"];
+
+    //Temp for testing
+    //token = authToken;
+
+    if (token == authToken)
+    {
+        string PropNo = Request["p"];
+        string SearchProperties = Request["s"];
+
+        //Temp Until Search is ready
+        SearchProperties = null;
+
+        if (PropNo != null || SearchProperties != null)
+        {
+            var db = Database.Open("CemeteriesDB");
+
+            //Property Details
+            var sql = "SELECT [ID],[BurialType],[Surname],[Forenames],[Age],[Gender],[DateOfDeath],[FuneralDirector],[CemeteryName] " +
+                      " ,[Location],[DateOfBurial],[WhatIsBuried],[Image],[DateOfBirth],[Occupation],[PlaceOfBirth],[Notes] " +
+                      "FROM [BurialPlots] P ";
+                       //"WHERE P.Status <> 'P' AND PROPERTY_NO = '" + PropNo + "'";
+
+            var PropDetails = db.QuerySingle(sql);
+
+                string json = Json.Encode(PropDetails);
+
+                response = json;
+
+            statusCode = 200;
+        }
+        else
+        {
+            statusCode = 400;
+        }
+    }
+
+    //Security
+    Response.Headers.Remove("Server");
+    Response.Headers.Remove("X-AspNet-Version");
+    Response.Headers.Remove("x-aspnetwebpages-version");
+
+    Response.ContentType = "application/json";
+    Response.StatusCode = statusCode;
+    Response.Write(response);
+}

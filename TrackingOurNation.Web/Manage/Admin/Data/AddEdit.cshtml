@@ -1,0 +1,422 @@
+﻿ @{
+    var hasSaved = Session["eventSaved"];
+    var CanAddNew = "";
+    if(hasSaved != null){
+        CanAddNew = "YES";
+        Session["eventSaved"] = null;
+    }
+
+    var Action = "";
+
+        var EventID="";
+        var eTitleFIX= "";
+        var HostClubID= "";
+        var EventDateStart="";
+        var EventTags="";
+        var EventTitle="";
+        var EventDescription="";
+        var OtherClubIDs="";  
+        var EventResults = "";
+        var EventDraws = "";
+        var EventPoster = "";
+        var eSystem = "";
+
+        var db = Database.Open("BrandNewDB");
+        var clubDets = db.QuerySingle("SELECT TOP 1 ClubID FROM CLUBS");
+        var sqlClubOptions = "";
+
+        var hasEventDraws = "fileupload-new";
+        var hasEventResults = "fileupload-new";
+        var hasEventPoster = "fileupload-new";
+
+        var sqlClubsAll = "SELECT ClubID, ClubName FROM CLUBS";
+
+    // Setup validation
+    Validation.RequireField("EventDateStart", "*Required!");
+    Validation.RequireField("EventTitle", "*Required!");
+    
+    //Add validation for Host Club!!!
+        
+    int id = Request["id"].AsInt();
+    if(id > 0){
+        var selectQueryString = "SELECT EventID, HostClubID, EventDateStart, EventTags, EventTitle, EventDescription, OtherClubIDs, EventResults, EventDraws, EventPoster, AllowEntrySystem "+
+                                "from EVENTS WHERE EventId = @0";
+        var EventDets = db.QuerySingle(selectQueryString, id);
+
+        clubDets = db.QuerySingle("SELECT Region, ClubName FROM CLUBS WHERE ClubID = @0", EventDets.HostClubID);
+        sqlClubOptions = "SELECT ClubID, ClubName FROM CLUBS WHERE Region = '" + clubDets.Region + "'";
+
+        EventID=EventDets.EventID.ToString();
+        HostClubID=EventDets.HostClubID.ToString();
+        //EventDateStart=EventDets.EventDateStart.ToShortDateString();
+        EventDateStart=string.Format("{0:dd MMM yyyy}", EventDets.EventDateStart);
+        EventTags=EventDets.EventTags;
+        EventTags= EventTags == null ? "" : EventTags;
+        EventTitle=EventDets.EventTitle;
+        EventDescription=EventDets.EventDescription;
+        OtherClubIDs=EventDets.OtherClubIDs;
+        OtherClubIDs= OtherClubIDs == null ? "" : OtherClubIDs;
+        EventDraws=EventDets.EventDraws;
+        EventResults=EventDets.EventResults;
+        EventPoster=EventDets.EventPoster;
+        eSystem=EventDets.AllowEntrySystem;
+
+        if(EventDets.EventDraws != null && EventDets.EventDraws != ""){
+            hasEventDraws = "fileupload-exists";           
+        }
+        if(EventDets.EventResults != null && EventDets.EventResults != ""){
+            hasEventResults = "fileupload-exists";           
+        }
+        if(EventDets.EventPoster != null && EventDets.EventPoster != ""){
+            hasEventPoster = "fileupload-exists";           
+        }
+
+                eTitleFIX = EventTitle.Replace(" & ", "-");
+                eTitleFIX = eTitleFIX.Replace("&", "");
+                eTitleFIX = eTitleFIX.Replace(".", "");
+                eTitleFIX = eTitleFIX.Replace(" ", "-");
+
+        Action = "Edit";
+    }
+    else{
+        Action = "Add";
+    }
+
+    if(IsPost){
+        if (Validation.IsValid()) {
+            //EventID=Request["EventID"];
+            HostClubID=Request["HostClubID"];
+
+            EventDateStart=Request["EventDateStart"];
+            DateTime AddEventDateStart=Convert.ToDateTime(EventDateStart);
+
+            EventTags=Request["EventTags"];
+            EventTitle=Request["EventTitle"];
+            EventDescription=Request.Unvalidated("EventDescription");
+            OtherClubIDs=Request["OtherClubIDs"];
+            eSystem=Request["eSystem"];
+
+            var fileSavePath = "";
+
+            var getFileName1 = Request.Files["EventDraws"];
+            if(getFileName1 != null){
+                if(getFileName1.ContentLength > 0){
+                    fileSavePath = Server.MapPath("~/Uploads/Draws/" + Path.GetFileName(getFileName1.FileName));
+                    getFileName1.SaveAs(fileSavePath);
+                    EventDraws = getFileName1.FileName; 
+                }               
+            }else{
+                EventDraws = "";
+            }
+
+            var getFileName2 = Request.Files["EventResults"];
+            if(getFileName2 != null){
+                if(getFileName2.ContentLength > 0){
+                    fileSavePath = Server.MapPath("~/Uploads/Results/" + Path.GetFileName(getFileName2.FileName));
+                    getFileName2.SaveAs(fileSavePath);
+                    EventResults = getFileName2.FileName;    
+                }            
+            }else{
+                EventResults = "";
+            }
+
+            var getFileName3 = Request.Files["EventPoster"];
+            if(getFileName3 != null){
+                if(getFileName3.ContentLength > 0){
+                    fileSavePath = Server.MapPath("~/Uploads/Posters/" + Path.GetFileName(getFileName3.FileName));
+                    getFileName3.SaveAs(fileSavePath);
+                    EventPoster = getFileName3.FileName; 
+                }               
+            }else{
+                EventPoster = "";
+            }
+
+            if(Action != "Add" ){
+                  var executeQueryString="UPDATE EVENTS Set EventDateStart=@0, EventTags=@1, EventTitle=@2, EventDescription=@3, OtherClubIDs=@4, EventResults=@5, EventDraws=@6, EventPoster=@7, AllowEntrySystem=@8  " +
+                                         "WHERE EventId=@9";
+                  db.Execute(executeQueryString, AddEventDateStart, EventTags, EventTitle, EventDescription, OtherClubIDs, EventResults, EventDraws, EventPoster, eSystem, id);
+                  Session["eventSaved"] = "Edited";
+                  Response.Redirect("~/Master/Events/AddEdit/?id="+ id);         
+            }
+            else{
+                //HostClubID=ClubID;
+                var insertQueryString = "INSERT INTO EVENTS " +
+                                        "(HostClubID, EventDateStart, EventTags, EventTitle, EventDescription, OtherClubIDs, EventResults, EventDraws, EventPoster) " +
+                                        "VALUES (@0, @1, @2, @3, @4, @5, @6, @7, @8)";
+                db.Execute(insertQueryString, HostClubID, AddEventDateStart, EventTags, EventTitle, EventDescription, OtherClubIDs, EventResults, EventDraws, EventPoster);
+                Session["eventSaved"] = "New";
+                var getNewID = db.QuerySingle("SELECT EventID FROM EVENTS WHERE EventID = @@IDENTITY");
+                Response.Redirect("~/Master/Events/AddEdit/?id="+ getNewID.EventID);
+            }  
+        } 
+    }
+
+    Page.Title = Action + " Event";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="boxIT">
+            <div class="pagehead">
+                <div class="col-md-12 pageTitle">
+                    @Action Event
+                </div>
+            </div>
+            <div class="boxBody">
+                <form action="" enctype="multipart/form-data" method="post" class="form-horizontal">
+                    <div class="form-body">
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">Event Date</label>
+                            <div class="col-md-7">
+                                <input type="text" name="EventDateStart" id="dp1" data-date-format="dd MM yyyy" value="@EventDateStart" class="col-md-3 datepicker">@Html.ValidationMessage("EventDateStart")
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">Event Title</label>
+                            <div class="col-md-7">
+                                <input type="text" class="col-md-12 m-wrap popovers" name="EventTitle" value="@EventTitle" data-trigger="hover" data-content="Brief but descriptive event title" data-original-title="Event Title" />@Html.ValidationMessage("EventTitle")
+                            </div>
+                        </div>
+                        @if (Action != "Add")
+                        {
+                            <div class="form-group">
+                                <label class="col-md-2 control-label">EventID</label>
+                                <div class="col-md-7 control-text">
+                                    <strong>@EventID</strong>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-2 control-label">Live URL</label>
+                                <div class="col-md-7 control-text">
+                                    <a target="_blank" href="~/event/@EventID/@eTitleFIX">http://golfison.com/event/@EventID/@eTitleFIX</a>
+                                </div>
+                            </div>
+                        }
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">Host Club</label>
+                            <div class="col-md-7 control-text">
+                                @if (Action != "Add")
+                                {
+                                    <strong>@clubDets.ClubName (@HostClubID)</strong>
+                                }
+                                else
+                                {
+                                    <select name="HostClubID" data-placeholder="Select Other Clubs" class="col-md-4 chzn-select" tabindex="5">
+                                        <option value=""></option>
+                                        @foreach (var row in db.Query(sqlClubsAll))
+                                        {
+                                            <option @(HostClubID.Contains(row.ClubID.ToString()) ? "selected" : "") value="@row.ClubID">@row.ClubName</option>
+                                        }
+                                    </select>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">Event Description</label>
+                            <div class="col-md-7">
+                                <textarea name="EventDescription" class="descriptionZone" placeholder="Enter text ..." style="width: 95%; height: 200px">@EventDescription</textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">Event Tags</label>
+                            @*<div class="col-md-7">
+                        <input type="text" class="span6 m-wrap popovers" name="EventTags" value="@EventTags" data-trigger="hover" data-content="Select multiple tags that describe the event" data-original-title="Enter Tags"/>
+                    </div>*@
+                            <div class="col-md-7">
+                                <select name="EventTags" data-placeholder="Select Event Description Tags" class="col-md-12 chzn-select" multiple tabindex="4">
+                                    <option value=""></option>
+                                    <optgroup label=".">
+                                        <option @(EventTags.Contains("Club") ? "selected" : "")>Club</option>
+                                        <option @(EventTags.Contains("Tournament") ? "selected" : "")>Tournament</option>
+                                    </optgroup>
+                                    <optgroup label="Gender">
+                                        <option @(EventTags.Contains("Mens") ? "selected" : "")>Mens</option>
+                                        <option @(EventTags.Contains("Womens") ? "selected" : "")>Womens</option>
+                                        <option @(EventTags.Contains("Junior") ? "selected" : "")>Junior</option>
+                                        <option @(EventTags.Contains("Mixed") ? "selected" : "")>Mixed</option>
+                                        <option @(EventTags.Contains("All") ? "selected" : "")>Combined</option>
+                                    </optgroup>
+                                    <optgroup label="Event Format">
+                                        <option @(EventTags.Contains("Strokeplay") ? "selected" : "")>Strokeplay</option>
+                                        <option @(EventTags.Contains("Stableford") ? "selected" : "")>Stableford</option>
+                                        <option @(EventTags.Contains("Matchplay") ? "selected" : "")>Matchplay</option>
+                                        <option @(EventTags.Contains("Foresomes") ? "selected" : "")>Foursome</option>
+                                        <option @(EventTags.Contains("Scramble") ? "selected" : "")>Scramble</option>
+                                        <option @(EventTags.Contains("4BBB") ? "selected" : "")>4BBB</option>
+                                        <option @(EventTags.Contains("Ambrose") ? "selected" : "")>Ambrose</option>
+                                        <option @(EventTags.Contains("Medal") ? "selected" : "")>Medal</option>
+                                        <option @(EventTags.Contains("Medley") ? "selected" : "")>Medley</option>
+                                        <option @(EventTags.Contains("Greensome") ? "selected" : "")>Greensome</option>
+                                        <option @(EventTags.Contains("Canadian Foursome") ? "selected" : "")>Canadian Foursome</option>
+                                        <option @(EventTags.Contains("American Foresomes") ? "selected" : "")>American Foursome</option>
+                                        <option @(EventTags.Contains("Bisque") ? "selected" : "")>Bisque</option>
+                                        <option @(EventTags.Contains("Bisque Par") ? "selected" : "")>Bisque Par</option>
+                                        <option @(EventTags.Contains("Par") ? "selected" : "")>Par</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">Show Event on Other Clubs</label>
+                            @*<div class="col-md-7">
+                        <input type="text" class="span6 m-wrap popovers" name="OtherClubIDs" value="@OtherClubIDs" data-trigger="hover" data-content="Start typing to and select other Clubs that are involved" data-original-title="Enter Other Clubs"/>
+                    </div>*@
+                            <div class="col-md-7">
+                                <select name="OtherClubIDs" data-placeholder="Select Other Clubs" class="col-md-12 chzn-select" multiple tabindex="5">
+                                    <option value=""></option>
+                                    @foreach (var row in db.Query(sqlClubsAll))
+                                    {
+                                        <option @(OtherClubIDs.Contains(row.ClubID.ToString()) ? "selected" : "") value="@row.ClubID">@row.ClubName</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">Event Poster</label>
+                            <div class="col-md-7">
+                                <div class="fileupload @hasEventPoster" data-provides="fileupload">
+                                    <span class="btn btn-file">
+                                        <span class="fileupload-new">Select file</span>
+                                        <span class="fileupload-exists">Change</span>
+                                        <input type="file" name="EventPoster" id="EventPoster" value="@EventPoster" />
+                                    </span>
+                                    @*<div class="fileupload-preview fileupload-exists thumbnail" style="max-width: 200px; max-height: 150px; line-height: 20px;">
+                                <img src="~/Uploads/Posters/@EventPoster">
+                            </div>*@
+                                    <span class="fileupload-preview fileupload-exists">
+                                        @EventPoster <a href="~/Uploads/Posters/@EventPoster" target="_blank">Click to View</a>
+                                    </span>
+                                    @*<span class="fileupload-preview">@EventPoster</span>*@
+                                    <a href="#" class="close fileupload-exists" data-dismiss="fileupload" style="float: none"></a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">Draws</label>
+                            <div class="col-md-7">
+                                <div class="fileupload @hasEventDraws" data-provides="fileupload">
+                                    <span class="btn btn-file">
+                                        <span class="fileupload-new">Select file</span>
+                                        <span class="fileupload-exists">Change</span>
+                                        <input type="file" name="EventDraws" />
+                                    </span>
+                                    <span class="fileupload-preview fileupload-exists">
+                                        @EventDraws <a href="~/Uploads/Draws/@EventDraws" target="_blank">Click to View</a>
+                                    </span>
+                                    @*<span class="fileupload-preview">@EventDraws</span>*@
+                                    <a href="#" class="close fileupload-exists" data-dismiss="fileupload" style="float: none"></a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">Results</label>
+                            <div class="col-md-7">
+                                <div class="fileupload @hasEventResults" data-provides="fileupload">
+                                    <span class="btn btn-file">
+                                        <span class="fileupload-new">Select file</span>
+                                        <span class="fileupload-exists">Change</span>
+                                        <input type="file" name="EventResults" />
+                                    </span>
+                                    <span class="fileupload-preview fileupload-exists">
+                                        @EventResults <a href="~/Uploads/Results/@EventResults" target="_blank">Click to View</a>
+                                    </span>
+                                    @*<span class="fileupload-preview">@EventResults</span>*@
+                                    <a href="#" class="close fileupload-exists" data-dismiss="fileupload" style="float: none"></a>
+                                </div>
+                            </div>
+                        </div>
+                        @if (Action != "Add")
+                        {
+                            <div class="form-group">
+                                <label class="col-md-2 control-label">Event Entry System</label>
+                                <div class="col-md-7">
+                                    <select name="eSystem" id="eSystemDD" class="span3 m-wrap popovers" data-trigger="hover" data-content="Turn ON & save to use Golfison Entry System" data-original-title="Entry System">
+                                        <option value="OFF" @(eSystem == "OFF" ? "selected" : "")>OFF</option>
+                                        <option value="ON" @(eSystem == "ON" ? "selected" : "")>ON</option>
+                                    </select>
+                                    <a class="btn green eSystemEntrySettings" href="~/Master/EntrySystem/Setup?id=@EventID">Entry System Setup</a>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="form-actions">
+                        <div class="col-md-offset-3 col-md-9">
+                            <input class="btn btn-primary" type="submit" value="Save Event" />
+                            <a class="btn btn-info" href="~/Master/Events">Cancel</a>
+                            @if (Action != "Add")
+                            {
+                                <a class="btn btn-danger" href="~/Master/Events/Delete?id=@EventID">Delete</a>
+                            }
+                            @if (CanAddNew != "YES")
+                            {
+                                <a class="btn btn-primary pull-right" href="Events/AddEdit"><i class="icon-plus"></i> Add New</a>
+                            }
+                        </div>
+                    </div>
+                </form>             
+            </div>
+             
+        </div>
+              
+    </div>
+    <input type="hidden" id="HasJustSaved" value="@hasSaved" />
+</div>
+
+
+@section FooterExtra {
+    <link rel="stylesheet" type="text/css" href="~/Assets/Scripts/Bootstrap/datepicker.css">
+    <script src="~/Assets/Scripts/Bootstrap/bootstrap-datepicker.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="~/Assets/Scripts/Bootstrap/bootstrap-wysihtml5.css">
+    <script src="~/Assets/Scripts/Bootstrap/wysihtml5-0.3.0.min.js"></script>
+    <script src="~/Assets/Scripts/Bootstrap/bootstrap-wysihtml5.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="~/Assets/Scripts/Bootstrap/bootstrap-fileupload.css">
+    <script src="~/Assets/Scripts/Bootstrap/bootstrap-fileupload.js"></script>
+
+    <link rel="stylesheet" href="~/Assets/Scripts/toastr/toastr.css" />
+    <script src="~/Assets/Scripts/toastr/toastr.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="~/Assets/Scripts/JQuery/Chosen/chosen.css">
+    <script src="~/Assets/Scripts/JQuery/Chosen/chosen.jquery.js"></script>
+    <script type="text/javascript"> $(".chzn-select").chosen(); $(".chzn-select-deselect").chosen({allow_single_deselect:true}); </script>
+    <style> .chosen-container-multi .chosen-choices li.search-field input[type="text"] { height: 100%;}</style>
+    
+    <script src="~/Assets/Scripts/JQuery/jquery.tagsinput.js"></script>
+    <script>
+        $('.datepicker').datepicker();
+        $('.descriptionZone').wysihtml5();
+        $('.popovers').popover();
+    </script>
+    <script>
+        $(document).ready(function () {
+            var n = $("#eSystemDD").val();
+            switch (n) {
+                case 'ON':
+                    $(".eSystemEntrySettings").show();
+                    break;
+                case 'OFF':
+                    $(".eSystemEntrySettings").hide();
+                    break;
+            }
+
+            var x = $("#HasJustSaved").val();
+            toastr.options.timeOut = 2000;
+            toastr.options.extendedTimeOut = 0;
+            toastr.options.positionClass = 'toast-top-center';
+            switch (x) {
+                case 'Edited':
+                    toastr.success('Event was successfully Edited')
+                    break;
+                case 'New':
+                    toastr.success('New Event was Added')
+                    break;
+            }
+            });
+    </script>
+    <style>
+        .wysihtml5-sandbox { border: 1px solid #cccccc;}
+    </style>
+}

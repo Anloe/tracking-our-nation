@@ -1,0 +1,235 @@
+/* 
+    Custom Styles for Golfison
+*/
+
+/* Search Boxes */
+    .NavSearch input[type="text"], .NavSearch input[type="text"]:focus, .NavSearch input[type="text"]:hover { 
+        background: none; border: none; -webkit-box-shadow:none; -moz-box-shadow:none; box-shadow:none; padding: 6px 0 4px 15px; margin-bottom: 0;}
+    .NavSearch { margin-top: 20px;}
+    /*header .NavSearch .form-search .input-append { margin-left: 10px;}*/
+    .NavSearch input[type="submit"] { width: 35px; padding:0; cursor: pointer; -webkit-appearance: none; float: right;}
+    .NavSearch input, .NavSearch textarea, .NavSearch .uneditable-input { width: 140px;}
+
+    #searchform { margin-bottom: 0;}
+    #searchBox { background: url("../img/search_top.png") no-repeat 0 0;
+                 height: 30px; width: 200px; text-align: left; margin: 0 10px 7px 10px;}
+        .searchinput { height: 20px; padding: 5px 5px 5px 0; font-size: 14px; font-style: italic; background: none repeat scroll 0 0 transparent; border: medium none;}
+        .btnSearch { width: 35px; height: 30px; background: none repeat scroll 0 0 transparent; border: medium none; cursor: pointer;}
+    
+/* Login */
+
+.visible-ie8 { display: none;}
+.visible-ie9 { display: none;}
+
+body.login {
+    color: #333;
+    font-size: .85em;
+    font-family: "Segoe UI", Verdana, Helvetica, Sans-Serif;
+    margin: 0;
+    padding: 0;
+    background: url("../Images/bgAdmin.jpg") repeat scroll 0 0 transparent;
+}
+
+.login .logo {
+    width: 247px;
+    margin: 0 auto;
+    margin-top: 60px;
+    padding: 15px;
+    text-align: center;
+}
+
+.login .content {
+    background-color: #fff;
+    width: 360px;
+    margin: 0 auto;
+    padding: 20px 30px 40px;
+}
+.login .content .input-icon, .login .content .input-icon {
+    border-left: 2px solid #35aa47 !important;
+    margin-bottom: 20px;
+}
+.login .content .form-title { font-weight: 300; margin-bottom: 25px;}
+.login .content .form-group { margin-bottom: 15px;}
+.login .content .form-actions {
+    background-color: #FFF;
+    clear: both;
+    border-width: 0px 0px 1px;
+    border-style: none none solid;
+    border-color: -moz-use-text-color -moz-use-text-color #EEE;
+    -moz-border-top-colors: none;
+    -moz-border-right-colors: none;
+    -moz-border-bottom-colors: none;
+    -moz-border-left-colors: none;
+    border-image: none;
+    padding: 0px 30px 25px;
+    margin-left: -30px;
+    margin-right: -30px;
+}
+
+
+.login legend { border: none; margin-bottom: 0; line-height: 40px;}
+.login legend .form-group{ margin-top: 20px; margin-bottom: 10px; -webkit-margin-top-collapse: separate;}
+
+.login .content .input-icon .m-wrap {
+    margin: 0px !important;
+}
+.login .content .m-wrap {
+    width: 249px;
+    border-left: 0 !important;
+    color: #333333;
+    outline: 0;
+    height: 30px;
+    line-height: 30px;
+    font-size: 14px;
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    border-radius: 0;
+}
+
+.input-icon.left i {
+    color: #ccc;
+    display: block !important;
+    position: absolute !important;
+    z-index: 1;
+    margin: 9px 2px 4px 10px;
+    width: 16px;
+    height: 16px;
+    font-size: 16px;
+    text-align: center;
+}
+input[type="password"].m-wrap, input[type="text"].m-wrap {
+    padding: 6px 6px !important;
+}
+.input-icon.left input {
+    padding-left: 33px !important;
+}
+
+.btn {
+    background-color: #e5e5e5;
+    background-image: none;
+    filter: none;
+    border: 0;
+    box-shadow: none;
+    padding: 7px 14px;
+    text-shadow: none;
+    font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    color: #333333;
+    cursor: pointer;
+    outline: none;
+    -webkit-border-radius: 0 !important;
+    -moz-border-radius: 0 !important;
+    border-radius: 0 !important;
+}
+.btn.green {
+    color: white;
+    text-shadow: none;
+    background-color: #35aa47;
+}
+
+.login .content .checkbox {
+    margin-top: 8px;
+    display: inline-block;
+    width: 100px;
+}
+
+.login .content label.checkbox{
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 20px;
+}
+
+.login .alert {
+    padding: 0 5px;
+    border: none;
+}
+
+/* Show Special */
+#XYXYXY { display: none;}
+#XYXYXY.viewable { display: block;}
+l
+
+#NewsGrid { margin-top: 15px;}
+
+.clickable, .table-striped tbody > tr.clickable:nth-child(odd) td{
+    cursor: pointer;
+    background-color: #ffff99;
+}
+.table thead { }
+.table thead a { text-decoration: none; color: #FFF;}
+
+.greyHeadTable { background-color: #4b8df8;}
+
+.webgrid-footer { font-size: 16px;}
+
+.btn { font-size: 16px;}
+
+.m-wrap.medium {
+    width: 206px !important;
+}
+
+.portlet.box .portlet-action {
+    background-color: #fff;
+    padding: 0 10px 10px 10px;
+}
+
+.portlet-title .badge{
+    font-size: 11px !important;
+    font-weight: 300;
+    top: 8px;
+    right: 24px;
+    text-align: center;
+    height: 14px;
+    background-color: #e02222;
+    padding: 2px 6px 2px 6px;
+    -webkit-border-radius: 12px !important;
+    border-radius: 12px !important;
+    text-shadow: none !important;
+    display: inline-block;
+    line-height: 14px;
+    color: #fff;
+    white-space: nowrap;
+    vertical-align: baseline;
+}
+
+.page-title.xButtons .btn{
+    margin: 0 3px;
+}
+
+.form-search .input-append { vertical-align: top;}
+.form-search { margin-bottom: 0; padding: 0;}
+
+.wysihtml5-sandbox { border: 1px solid #cccccc;}
+
+.header .brand {
+    width: 185px;
+}
+
+.DashClubName { color: #fff; margin-top: 10px; line-height: 20px; font-size:16px; display: inline-block;}
+
+.fileupload .close {
+    margin-left: 3px;
+    opacity: 1.0;
+}
+
+.search-choice {
+    color: #fff;
+    background-color: #4b8df8 !important;
+}
+
+.field-validation-error{
+    color: #f00;
+    font-weight: bold;
+}
+
+.control-group strong{
+    font-size: 16px;
+}
+
+
+@media (max-width: 480px) {
+    .header .brand {
+        width: 120px;
+    }
+}
+

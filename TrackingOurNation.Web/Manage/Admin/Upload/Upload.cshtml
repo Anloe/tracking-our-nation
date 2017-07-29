@@ -1,0 +1,88 @@
+﻿@using System.Data;
+@using System.Data.Common;
+@using System.Data.OleDb;
+@{
+    DataSet dataset = new DataSet();
+    var fullPath = "";
+    var fName = "";
+
+    if(IsPost){
+
+        var UploadedPicture = Request.Files[0];
+        //var getFileName1 = Request.Files["EventDraws"];
+        var fileSavePath = "";
+
+            if(UploadedPicture != null){
+                if(UploadedPicture.ContentLength > 0){
+
+                    //Save to Server
+                    fileSavePath = Server.MapPath("~/Uploads/LoadFiles/" + Path.GetFileName(UploadedPicture.FileName));
+                    UploadedPicture.SaveAs(fileSavePath);
+                    fName = UploadedPicture.FileName; 
+                    //Load onto page
+                    fullPath = Path.GetFullPath(UploadedPicture.FileName);
+                    fullPath = Path.GetDirectoryName(fullPath);
+                    // Initialize connection variables
+                    string ConnectionString = "Provider=Microsoft.Jet.OLEDB.4.0; Data Source=" +
+                            Server.MapPath("~/Uploads/LoadFiles/") + @"; Extended Properties=""text;HDR=Yes;"";";
+                    string CommandText = "select * from [" + fName + "]";
+                    OleDbConnection myConnection = new OleDbConnection(ConnectionString);
+                    OleDbCommand myCommand = new OleDbCommand(CommandText, myConnection);
+                    //DataSet dataset = new DataSet();
+                    // Open connection
+                    myConnection.Open();
+                    // Fill DataSet
+                    OleDbDataAdapter oda = new OleDbDataAdapter(myCommand);
+                    oda.Fill(dataset);
+                    // Close connection
+                    myConnection.Close();
+
+                    //Upload to Database
+                    var db = Database.Open("BrandNewDB");
+                        foreach(DataRow row in dataset.Tables["Table"].Rows)
+                        {
+                            var SponsorID = row[0];
+                            var DisplayName = row[1];
+                            var ImageSmall = row[2];
+                            var ImageMedium = row[3];
+                            var ImageLarge = row[4];
+                            var WebLink = row[5];
+
+                            var insertQueryString = "INSERT INTO SPONSORS " +
+                                                    "(DisplayName, ImageSmall, ImageMedium, ImageLarge, WebLink) " +
+                                                    "VALUES (@0, @1, @2, @3, @4)";
+                            db.Execute(insertQueryString, DisplayName, ImageSmall, ImageMedium, ImageLarge, WebLink);
+                        }
+
+                    db.Close();
+
+                    Response.Redirect("~/Manager/Sponsors");
+                }               
+            }else{
+                Response.Redirect("~/Manager/Sponsors/Upload"); 
+            }
+
+        fName = Path.GetFileName(UploadedPicture.FileName);
+
+
+    }
+    Page.Title = "Upload Sponsors from CSV";
+}
+
+<div class="col-md-4 col-md-offset-4">
+    <div class="boxIT">
+        <div class="boxhead">
+            Sponsor CSV Import
+        </div>
+        <div class="boxBody">
+            <br>  
+            @FileUpload.GetHtml(
+                initialNumberOfFiles:1,
+                allowMoreFilesToBeAdded:false,
+                includeFormTag:true
+            ) 
+            <br><br> 
+            <a class="btn btn-danger" href="/Admin/Sponsors">Cancel</a>                               
+        </div>
+    </div>
+</div>

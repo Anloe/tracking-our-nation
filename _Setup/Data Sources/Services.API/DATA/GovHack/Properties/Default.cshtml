@@ -1,0 +1,114 @@
+﻿@using Newtonsoft.Json;
+@using System.Configuration;
+@{
+    Layout = null;
+
+    var response = "";
+    int statusCode = 200;
+
+    //Check For GET
+    var apiMethod = Request.HttpMethod;
+
+    //Check Auth Header
+    string token = "";
+    try
+    {
+        //token = Request.Headers.GetValues("Authorization").FirstOrDefault();
+        token = Request.Headers.GetValues("UserAuthToken").First();
+    }
+    catch (Exception ex)
+    {
+        token = ex.ToString();
+        statusCode = 401;
+    }
+
+    var authToken = ConfigurationManager.AppSettings["WebMapsAuthToken"];
+
+    //Temp for testing
+    //token = authToken;
+
+    if (token == authToken)
+    {
+        string PropNo = Request["p"];
+        string SearchProperties = Request["s"];
+
+        //Temp Until Search is ready
+        SearchProperties = null;
+
+        if (PropNo != null || SearchProperties != null)
+        {
+            var db = Database.Open("aCORE_Warehouse");
+
+            //Property Details
+            var sql = "SELECT TOP 1 P.[PROPERTY_NO] PropertyNo, " +
+                                   "[ASSESSMENT_NO] ValuationNo, " +
+                                   "P.[STATUS], " +
+                                   "[LocationAddress], " +
+                                   "[Locality]," +
+                                   "[LandUseDescription]," +
+                                   "[OverrideLegalDescription] LegalDescription " +
+                       "FROM [aCORE_Warehouse].[dbo].[T1_Property_Details] P " +
+                       "WHERE P.Status <> 'P' AND PROPERTY_NO = '" + PropNo + "'";
+
+            var PropDetails = db.QuerySingle(sql);
+
+            if (PropDetails != null)
+            {
+                var PropertyNo = PropDetails.PropertyNo;
+                var ValuationNo = PropDetails.ValuationNo;
+                var Status = PropDetails.Status;
+                var LocationAddress = PropDetails.LocationAddress;
+                var Locality = PropDetails.Locality;
+                var LandUseDescription = PropDetails.LandUseDescription;
+                var LegalDescription = PropDetails.LegalDescription;
+
+                //Dictionary<string, string> resultData = new Dictionary<string, string>();
+                Dictionary<string, object> resultData = new Dictionary<string, object>();
+                resultData.Add("PropertyNo", PropertyNo);
+                resultData.Add("ValuationNo", ValuationNo);
+                resultData.Add("Status", Status);
+                resultData.Add("LocationAddress", LocationAddress);
+                resultData.Add("Locality", Locality);
+                resultData.Add("LandUseDescription", LandUseDescription);
+                resultData.Add("LegalDescription", LegalDescription);
+
+
+                //Consents
+                var slqConsents = "SELECT CONSENT_ID ConsentNo, DESCRIPTION Description, DECISION Decision, STATUS, " +
+                                         "CASE WHEN RAM_PRIMARY_GROUP = 'BldgCons' THEN 'Building Consent' WHEN RAM_PRIMARY_GROUP = 'RCResConst' THEN 'Resource Consent' ELSE '' END ConsentType " +
+                                  "FROM [aCORE_Warehouse].[dbo].[T1_Consent_Details] " +
+                                  "WHERE (RAM_PRIMARY_GROUP = 'BldgCons' OR RAM_PRIMARY_GROUP = 'RCResConst') AND PROPERTY_NO = '" + PropNo + "' " +
+                                  "ORDER BY CONSENT_ID";
+
+                var ConsentDetails = db.Query(slqConsents);
+
+                var ConsentCount = ConsentDetails.Count();
+
+                if (ConsentCount > 0)
+                {
+                    string xJson = "";
+                    xJson = Json.Encode(ConsentDetails);
+                    resultData.Add("Consents", new List<string> { xJson });
+                }
+
+                string json = JsonConvert.SerializeObject(resultData);
+                response = json;
+            }
+
+            statusCode = 200;
+        }
+        else
+        {
+            statusCode = 400;
+        }
+    }
+
+    //Security
+    Response.Headers.Remove("Server");
+    Response.Headers.Remove("X-AspNet-Version");
+    Response.Headers.Remove("x-aspnetwebpages-version");
+
+    Response.ContentType = "application/json";
+    Response.StatusCode = statusCode;
+    Response.Write(response);
+}

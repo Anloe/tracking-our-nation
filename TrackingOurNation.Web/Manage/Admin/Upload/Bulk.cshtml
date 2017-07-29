@@ -1,0 +1,125 @@
+﻿@using  System.Linq;
+@{
+    Layout = "~/Dashboard/_DashboardLayout.cshtml";
+    string TableName = Request["Table"];
+    Page.Title = "Bulk Upload " + TableName;
+
+    var message = "";
+
+    if(IsPost){
+        
+        var numFiles = Request.Files.Count;
+        if(numFiles > 0)
+        {
+            try{ 
+                var file = Request.Files[0];
+                if(file.ContentLength == 0) {
+                    throw new Exception("File does not contain any lines");
+                }
+                message = file.ContentLength.ToString();
+
+                //Read First Line and extract Titles
+                var fileStream = file.InputStream;
+                var fileLength = file.ContentLength;
+                byte[] fileContent = new byte[fileLength];
+                fileStream.Read(fileContent, 0, fileLength);
+                string[] text = fileStream;
+
+                string TableCols = " (ClubID, ClubName, Region, State, Country, Website, Address, Phone, Active) ";
+
+                string ValueCols = "(@0, @1, @2, @3, @4, @5, @6, @7, @8)";
+
+                var insertQueryString = "INSERT INTO " + TableName + TableCols + " VALUES " + ValueCols;
+
+                var db = Database.Open("BrandNewDB");
+                foreach(string line in text) {
+
+                    db.Execute(insertQueryString, ClubID, ClubName, Region, State, Country, Website, Address, Phone, Active);             
+                }
+
+                Response.Redirect("~/Dashboard/" + TableName);
+            } 
+            catch(Exception exception) { 
+                message = exception.Message; 
+            } 
+        }
+    }
+}
+
+        <section class="container">
+                <div class="row">
+                    <div class="span8 offset2">
+                      <div class="well">
+                        <h1>Bulk Upload @TableName</h1>
+                        <form method="post" enctype="multipart/form-data">
+                            @*@Html.ValidationSummary("Unable to upload:")*@
+                            <fieldset class="no-legend">
+                                @FileUpload.GetHtml(uploadText: "Upload", includeFormTag: false, allowMoreFilesToBeAdded:false)
+                                <p class="form-actions">
+                                    <input class="btn btn-primary" type="submit" value="Import @TableName" />
+                                    <a class="btn btn-danger" href="~/Dashboard/@TableName">Cancel</a>
+                                </p>
+                            </fieldset>
+                        </form>
+                          <p class="message info">
+                            The default file size is limited to 4MB. To change this you will need to update the 'HttpRuntimeSection/MaxRequestLength' section in web.config. 
+                          </p> 
+                      </div>
+                    </div>
+                    <div class="error">
+                        @WebGrid
+                        Testing  @message
+                    </div>
+                </div>
+        </section>
+
+
+                @*//Add variables
+
+                //Loop Through data to add to database
+
+                            var db = Database.Open("BrandNewDB");
+                            var insertQueryString = "INSERT INTO " + TableName +
+                                            "(ClubID, ClubName, Region, State, Country, Website, Address, Phone, Active) " +
+                                            "VALUES (@0, @1, @2, @3, @4, @5, @6, @7, @8)";
+                            foreach(string line in text) 
+                            { 
+                                db.Execute("insert into SuburbsPostCodesAndStates (Suburb, State) values (@0, @1)", line, "NSW"); 
+                                db.Execute(insertQueryString, ClubID, ClubName, Region, State, Country, Website, Address, Phone, Active);
+                            }
+                //Response.Redirect("~/Dashboard/" + TableName);*@ 
+
+                    @*var ClubID=Request["ClubID"];
+                    var ClubName=Request["ClubName"];
+                    var Region=Request["Region"];
+                    var State=Request["State"];
+                    var Country=Request["Country"];
+                    var Website=Request["Website"];
+                    var Address=Request["Address"];
+                    var Phone=Request["Phone"];
+                    var Active=Request["Active"];*@
+
+                    @*var fileName = Path.GetFileName(file.FileName);
+                    var fileStream = file.InputStream;
+                    var fileLength = file.ContentLength;
+                    
+                    byte[] fileContent = new byte[fileLength];
+                    var test = fileStream.Read(fileContent, 0, fileLength);
+                    var grid = new WebGrid(test);*@
+
+                    @*var insertQueryString = "INSERT INTO " + TableName +
+                                            "(ClubID, ClubName, Region, State, Country, Website, Address, Phone, Active) " +
+                                            "VALUES (@0, @1, @2, @3, @4, @5, @6, @7, @8)";
+                    db.Execute(insertQueryString, ClubID, ClubName, Region, State, Country, Website, Address, Phone, Active);*@
+
+                    @*var db = Database.Open("MyDatabase"); 
+                    @for (var thing in stuff) {
+                        db.Execute("INSERT INTO Something (Field1, Field2) VALUES (@0, @1)", thing.Field1, thing.Field2)
+                    }*@
+
+                @*byte[] fileContent = new byte[fileLength];
+                fileStream.Read(fileContent, 0, fileLength);
+
+                var results = from e in fileContent
+                        select new { Name = e.Element("Name").Value, Sales = e.Element("Sales").Value };
+                var grid = new WebGrid(results);*@
