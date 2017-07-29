@@ -266,3 +266,4 @@ __DO_NOT_PUBLISH/
 App_Data/PublishProfiles/
 App_Data/AdminDB.sdf
 *.pubxml
+AdminDB.sdf
