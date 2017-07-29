@@ -79,7 +79,7 @@ ipch/
 *.ncb
 *.opendb
 *.opensdf
-*.sdf
+#*.sdf
 *.cachefile
 *.VC.db
 *.VC.VC.opendb
@@ -265,3 +265,4 @@ __pycache__/
 __DO_NOT_PUBLISH/
 App_Data/PublishProfiles/
 App_Data/AdminDB.sdf
+*.pubxml
