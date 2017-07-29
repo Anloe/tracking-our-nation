@@ -1,0 +1,21 @@
+﻿@{
+    var filter = UrlData[0];
+    if (filter != null)
+    {
+        var db = Database.Open("DataDB");
+        var sql = "SELECT G.IndicatorName, D.* " +
+                         "FROM GoalsData D " +
+                         "LEFT JOIN(SELECT DISTINCT GoalNumber, GoalKey, IndicatorName FROM GoalsDetails WHERE GoalNumber = '" + dataFilter + "') G  " +
+                         "ON D.GoalKey = G.GoalKey";
+        var data = db.Query(sql);
+
+        var json = Json.Encode(data);
+        Response.Write(json);
+    }else{
+        Response.StatusCode = 404;
+        var json = "Not Found";
+        Response.Write(json);
+    }
+
+}
+

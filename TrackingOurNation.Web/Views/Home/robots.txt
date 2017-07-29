@@ -1,0 +1,5 @@
+Disallow: /api/*
+Disallow: /Manage/*
+Disallow: /Views/*
+Disallow: /Uploads/*
+Disallow: /wwwroot/*
