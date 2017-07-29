@@ -8,6 +8,18 @@ body {
   font-family: "Roboto Slab", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
+.sdg-pic{
+    width: 100px;
+    height: 100px;
+    margin-bottom: 4px;
+}
+
+#subnav .parent {
+    height: 300px !important;
+    width: 1050px !important;
+    margin: auto;
+}
+
 #logo{
     width:100px;
     height:50px;
