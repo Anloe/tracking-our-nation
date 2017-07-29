@@ -8,10 +8,8 @@
 /*header  { float: left; height: auto; margin: 20px 0 0 0; width: 100%;}*/
     header h1 { font-size:30px;}
 
-nav     { float: left; height: auto; margin: 20px 0; width: 100%; overflow:hidden;}
-#subnav .parent { color: white; clear: left; float: left; background-color: #2E2E2E;
-                  -webkit-box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.2); -moz-box-shadow: 3px 3px 0px rgba(0,0,0,0.2);
-                  box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.2); height: 41px; margin: 30px 0 0 0; width: 100%;}
+nav     { float: left; height: auto; margin: 0px 0; width: 100%; overflow:hidden;}
+#subnav .parent { color: white; clear: left; float: left; background-color: #FFFF; height: 41px; margin: 30px 0 0 0; width: 100%;}
         #subnav .parent .section-title { background-color: #E61C33;display: block; float: left; height: 41px; padding-left: 15px; margin-left: -1px; width: 120px;padding-top:12px;}
         #subnav .parent .section-title a { text-decoration: none; color: white; font-weight:bold; }
         #subnav .parent ul { float: left;margin: 0px 0 0 0px;width: auto;border: none; list-style: none; display:block;}
