@@ -3,10 +3,10 @@
     Response.CacheControl = "no-cache";
     if (Request.FilePath != "/Manage/Login")
     {
-        //if (!WebSecurity.IsAuthenticated)
-        //{
-        //    var returnUrl = "~/Manage/Login?ReturnUrl=" + Request.Url.LocalPath;
-        //    Response.Redirect(returnUrl);
-        //}
+        if (!WebSecurity.IsAuthenticated)
+        {
+            var returnUrl = "~/Manage/Login?ReturnUrl=" + Request.Url.LocalPath;
+            Response.Redirect(returnUrl);
+        }
     }
 }
