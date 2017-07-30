@@ -1,0 +1,81 @@
+﻿swagger: "2.0"
+info:
+  description: "This is TrackOurNation's Data api. This allows third party venders tap into the data we have collected"
+  version: "1.0.0"
+  title: "Track Our Nation"
+  termsOfService: "http://swagger.io/terms/"
+  contact:
+    email: "SomeEmails@trackournation.space"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "trackingournation.azurewebsites.net"
+basePath: "/api"
+tags:
+- name: "Goals"
+  description: "All of the Tracked Goals"
+  externalDocs:
+    description: "Find out more"
+    url: "http://swagger.io"
+schemes:
+- "http"
+paths:
+  /goals:
+    get:
+      tags:
+      - "Goals"
+      summary: "List All the Current Goals"
+      description: "Returns a list of all the distictive goals"
+      operationId: "Goals"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Goal"
+        400:
+          description: "Invalid status value"
+  /goals/{indicatorNumber}:
+    get:
+      tags:
+      - "Goals"
+      summary: "Gets the goal for the indicator Number"
+      description: "Gets the whole goal object which is related to the IndicatorObject"
+      operationId: "goalByIndicatorNumber"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "indicatorNumber"
+        in: "path"
+        description: "indicator number to filter by"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Goal"
+        400:
+          description: "Invalid tag value"
+securityDefinitions:
+  api_key:
+    type: "apiKey"
+    name: "api_key"
+    in: "header"
+definitions:
+  Goal:
+    type: "object"
+    properties:
+      GoalName:
+        type: "string"
+      GoalDescription:
+        type: "string"
+        format: "int64"
+externalDocs:
+  description: "Find out more about Swagger"
+  url: "http://swagger.io"

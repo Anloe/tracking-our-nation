@@ -2,21 +2,16 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<!-- Header -->
-<header>
-    <div class="container">
-        <div class="intro-text">
-            <div class="intro-heading">Tracking Our Nation</div>
-            <a href="#api" class="page-scroll btn btn-xl">How are we tracking?</a>
-            <a href="#about" class="page-scroll btn btn-xl">Tell Me More</a>
-        </div>
-    </div>
-</header>
-
-@RenderPage("~/Views/Home/_DataIntro.cshtml")
+@RenderPage("~/Views/Home/_HeadIntro.cshtml")
 
 @RenderPage("~/Views/Home/_HowItWorks.cshtml")
 
-@RenderPage("~/Views/Home/_About.cshtml")
+@RenderPage("~/Views/Home/_DataButtons.cshtml")
+
+@RenderPage("~/Views/Home/_History.cshtml")
 
 @RenderPage("~/Views/Home/_ContactForm.cshtml")
+
+@section FooterExtra {
+    <link href="~/wwwroot/lib/Isotope/style.css" rel="stylesheet" />
+}

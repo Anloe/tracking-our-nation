@@ -52,7 +52,7 @@ a.active {
   outline: none;
 }
 a {
-  color: #fed136;
+  /*color: #fed136;*/
 }
 a:hover,
 a:focus,
@@ -257,7 +257,7 @@ header {
   /*background-position: center center;*/
   -webkit-background-size: contain;
   -moz-background-size: contain;
-  background-size: contain;
+  background-size: 100% 70%;
   -o-background-size: contain;
   text-align: center;
   color: white;
