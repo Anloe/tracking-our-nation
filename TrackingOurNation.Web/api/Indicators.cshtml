@@ -1,21 +1,23 @@
 ﻿@{
-    var filter = UrlData[1];
+    var db = Database.Open("DataDB");
+    var filter = UrlData[0];
+    var sql = "";
+    filter = filter.Replace("'", "");
+    filter = filter.Replace("<", "");
+    filter = filter.Replace(">", "");
     if (filter != null)
     {
-        var db = Database.Open("DataDB");
-        var sql = "SELECT G.IndicatorName, D.* " +
-                         "FROM GoalsData D " +
-                         "LEFT JOIN(SELECT DISTINCT GoalNumber, GoalKey, IndicatorName FROM GoalsDetails WHERE GoalNumber = '" + dataFilter + "') G  " +
-                         "ON D.GoalKey = G.GoalKey";
-        var data = db.Query(sql);
-
-        var json = Json.Encode(data);
-        Response.Write(json);
-    }else{
-        Response.StatusCode = 404;
-        var json = "Not Found";
-        Response.Write(json);
+        sql = "SELECT det.targetName, det.IndicatorName, dat.Value, dat.unit FROM GoalsData dat" +
+                "JOIN GoalsDetails det on det.GoalKey = dat.GoalKey" +
+                "and det.IndicatorNumber = '" + filter + "'" +
+                "order by dat.year desc";
     }
-
+    else
+    {
+        sql = "SELECT IndicatorNumber, IndicatorName FROM GoalsDetails";
+    }
+    var data = db.Query(sql);
+    var json = Json.Encode(data);
+    Response.Write(json);
 }
 

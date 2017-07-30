@@ -16,7 +16,7 @@ tags:
   description: "All of the Tracked Goals"
   externalDocs:
     description: "Find out more"
-    url: "http://swagger.io"
+    url: "http://trackingournation.azurewebsites.net/api/goals/"
 schemes:
 - "http"
 paths:
@@ -38,13 +38,31 @@ paths:
               $ref: "#/definitions/Goal"
         400:
           description: "Invalid status value"
-  /goals/{indicatorNumber}:
+  /indicators:
     get:
       tags:
-      - "Goals"
-      summary: "Gets the goal for the indicator Number"
-      description: "Gets the whole goal object which is related to the IndicatorObject"
-      operationId: "goalByIndicatorNumber"
+      - "Indicators"
+      summary: "Gets all indicators details"
+      description: "Gets all the target name and indicator name and the current value"
+      operationId: "indicators"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/indicator"
+        400:
+          description: "Invalid tag value"
+  /indicators/{indicatorNumber}:
+    get:
+      tags:
+      - "Indicators"
+      summary: "Gets the indicator details"
+      description: "Gets the target name and indicator name and the current value"
+      operationId: "GetAllindicators"
       produces:
       - "application/json"
       parameters:
@@ -59,7 +77,7 @@ paths:
           schema:
             type: "array"
             items:
-              $ref: "#/definitions/Goal"
+              $ref: "#/definitions/indicator"
         400:
           description: "Invalid tag value"
 securityDefinitions:
@@ -75,7 +93,17 @@ definitions:
         type: "string"
       GoalDescription:
         type: "string"
-        format: "int64"
+  indicator:
+    type: "object"
+    properties:
+      targetName:
+        type: "string"
+      IndicatorName:
+        type: "string"
+      CurrentDataValue:
+        type: "string"
+      UnitOfMeasurements:
+        type: "string"
 externalDocs:
   description: "Find out more about Swagger"
   url: "http://swagger.io"
